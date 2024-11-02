@@ -1,0 +1,42 @@
+
+
+# Ignore Gradle files
+.gradle/
+
+# Ignore local properties
+local.properties
+
+# Ignore Android Studio project-specific files
+.idea/
+*.iml
+
+# Ignore build output directories
+/build/
+app/build/
+
+# Ignore misc files
+*.log
+*.hprof
+.DS_Store
+
+# Ignore Proguard
+proguard/
+
+# Ignore captured screenshots and native builds
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Ignore Java class and other build files
+*.class
+*.dex
+*.apk
+*.ap_
+*.aab
+*.so
+*.jar
+*.war
+*.ear
+
+# Ignore Gradle wrapper JAR
+/gradle/wrapper/gradle-wrapper.jar
