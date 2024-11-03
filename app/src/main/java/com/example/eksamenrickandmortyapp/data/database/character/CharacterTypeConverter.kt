@@ -1,4 +1,4 @@
-package com.example.eksamenrickandmortyapp.data.database.type_converter
+package com.example.eksamenrickandmortyapp.data.database.character
 
 import androidx.room.TypeConverter
 import com.example.eksamenrickandmortyapp.data.Location

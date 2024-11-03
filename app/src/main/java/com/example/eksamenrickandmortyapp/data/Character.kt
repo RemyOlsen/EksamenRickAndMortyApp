@@ -3,7 +3,7 @@ package com.example.eksamenrickandmortyapp.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.eksamenrickandmortyapp.data.database.type_converter.CharacterTypeConverter
+import com.example.eksamenrickandmortyapp.data.database.character.CharacterTypeConverter
 
 
 @Entity(tableName = "character")

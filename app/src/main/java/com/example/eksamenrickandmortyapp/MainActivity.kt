@@ -11,17 +11,21 @@ import androidx.navigation.toRoute
 import com.example.eksamenrickandmortyapp.data.CharacterRepository
 import com.example.eksamenrickandmortyapp.navigation.CharacterDetails
 import com.example.eksamenrickandmortyapp.navigation.CharacterList
+import com.example.eksamenrickandmortyapp.navigation.CreateCharacter
 import com.example.eksamenrickandmortyapp.screens.character_details.CharacterDetailsScreen
 import com.example.eksamenrickandmortyapp.screens.character_details.CharacterDetailsViewModel
 import com.example.eksamenrickandmortyapp.ui.theme.EksamenRickAndMortyAppTheme
 import com.example.eksamenrickandmortyapp.screens.character_list.CharacterListScreen
 import com.example.eksamenrickandmortyapp.screens.character_list.CharacterListViewModel
+import com.example.eksamenrickandmortyapp.screens.custom_create.CustomCharacterCreateScreen
+import com.example.eksamenrickandmortyapp.screens.custom_create.CustomCharacterCreateViewModel
 
 class MainActivity : ComponentActivity() {
 
     // Late Initialization of ViewModel so the initialization
     private lateinit var _characterListViewModel: CharacterListViewModel
     private var _characterDetailsViewModel = CharacterDetailsViewModel()
+    private var _customCharacterCreateViewModel = CustomCharacterCreateViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +48,9 @@ class MainActivity : ComponentActivity() {
                                 viewModel = _characterListViewModel,
                                 onCharacterClick = { characterId ->
                                     navController.navigate(CharacterDetails(characterId))
+                                },
+                                onCreateCharacterClick = {
+                                    navController.navigate(CreateCharacter)
                                 }
                             )
                         }
@@ -59,6 +66,15 @@ class MainActivity : ComponentActivity() {
                         CharacterDetailsScreen(
                             viewModel = _characterDetailsViewModel,
                             onBackButtonClick = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable<CreateCharacter> {
+                        CustomCharacterCreateScreen(
+                            viewModel = _customCharacterCreateViewModel,
+                            onSaveSuccess = { navController.popBackStack() },
+                            onBackButtonClick = { navController.popBackStack() }
+
                         )
                     }
                 }

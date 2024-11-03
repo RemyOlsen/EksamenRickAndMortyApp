@@ -85,9 +85,7 @@ fun CharacterDetailsScreen(
             }
             Text(
                 modifier = Modifier.padding(8.dp),
-                text = "Character Details",
-                style = MaterialTheme.typography.titleLarge
-            )
+                text = "Character Details")
         }
 
         // Content

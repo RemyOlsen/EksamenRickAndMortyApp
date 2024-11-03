@@ -9,3 +9,6 @@ object CharacterList
 data class CharacterDetails(
     val characterId: Int
 )
+
+@Serializable
+object CreateCharacter

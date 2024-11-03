@@ -41,9 +41,17 @@ object CharacterRepository {
         ).build()
     }
 
+    fun getAppDatabase(): AppDatabase {
+        if (!::_appDatabase.isInitialized) {
+            throw IllegalStateException("you need to 'initializeDatabase() before getting it.")
+        }
+        return _appDatabase
+    }
+
     suspend fun getCharacters(page: Int): List<Character> {
 
         try {
+
             val response = _characterService.getAllCharacters(page)
 
             if (response.isSuccessful) {

@@ -10,11 +10,11 @@ import com.example.eksamenrickandmortyapp.data.Character
 interface CharacterDao {
 
     // Get all characters
-    @Query("SELECT * FROM Character ORDER BY id ASC")
+    @Query("SELECT * FROM character ORDER BY id ASC")
     suspend fun getCharacters(): List<Character>
 
     // Get character by Id
-    @Query("SELECT * FROM Character WHERE :characterId = id")
+    @Query("SELECT * FROM character WHERE :characterId = id")
     suspend fun getCharacterById(characterId: Int): Character?
 
     // Get the last page number
@@ -22,7 +22,7 @@ interface CharacterDao {
 //    suspend fun getLastPage(): Int?
 
     // Search for characters by name
-    @Query("SELECT * FROM Character WHERE name LIKE '%' || :name || '%' COLLATE NOCASE")
+    @Query("SELECT * FROM character WHERE name LIKE '%' || :name || '%' COLLATE NOCASE")
     suspend fun getCharactersByName(name: String): List<Character>
 
 //    @Query("SELECT * FROM Character WHERE name LIKE '%rick%'")
