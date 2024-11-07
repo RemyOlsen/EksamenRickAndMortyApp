@@ -82,6 +82,55 @@ object CharacterRepository {
         }
     }
 
+    suspend fun getAllCharacters(): List<Character> {
+        val allCharacters = mutableListOf<Character>()
+
+        try {
+            val firstPageResponse = _characterService.getAllCharacters(1)
+
+            if (!firstPageResponse.isSuccessful) {
+                Log.e("CharacterRepository", "Failed to get response from the first page")
+                return emptyList()
+            }
+
+            val firstPageBody = firstPageResponse.body()
+            if (firstPageBody == null) {
+                Log.e("CharacterRepository", "First page body is null")
+                return emptyList()
+            }
+
+            allCharacters.addAll(firstPageBody.results)
+
+            val totalPages = firstPageBody.info.pages
+            for (page in 2..totalPages) {
+                val pageResponse = _characterService.getAllCharacters(page)
+
+                if (!pageResponse.isSuccessful) {
+                    Log.e("CharacterRepository", "Failed to get response from page: $page")
+                    continue
+                }
+
+                val pageBody = pageResponse.body()
+                if (pageBody == null) {
+                    Log.e("CharacterRepository", "Page $page body is null")
+                    continue
+                }
+
+                allCharacters.addAll(pageBody.results)
+            }
+
+            _characterDao.insertCharacters(allCharacters)
+
+            return allCharacters
+        } catch (e: IOException) {
+            Log.e("CharacterRepository", "Network error, unable to connect to the API, getting characters from database", e)
+            return emptyList()
+            } catch (e: Exception) {
+            Log.e("CharacterRepository", "Failed to get list of characters, getting characters from database", e)
+            return emptyList()
+        }
+    }
+
 
     suspend fun getCharacterById(characterId: Int): Character? {
         return _characterDao.getCharacterById(characterId)

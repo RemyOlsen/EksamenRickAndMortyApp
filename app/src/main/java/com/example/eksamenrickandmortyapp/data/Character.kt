@@ -24,14 +24,6 @@ data class Character (
     val created: String,
 )
 
-//@Entity(tableName = "custom_character")
-//data class CustomCharacter(
-//    @PrimaryKey(autoGenerate = true)
-//    val id: Int = 0,
-//    val character: Character
-//)
-
-
 data class Origin(
     val name: String,
     val url: String

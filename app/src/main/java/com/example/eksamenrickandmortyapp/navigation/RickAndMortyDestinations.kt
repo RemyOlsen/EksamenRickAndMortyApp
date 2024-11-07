@@ -12,3 +12,6 @@ data class CharacterDetails(
 
 @Serializable
 object CreateCharacter
+
+@Serializable
+object CustomCharacterList

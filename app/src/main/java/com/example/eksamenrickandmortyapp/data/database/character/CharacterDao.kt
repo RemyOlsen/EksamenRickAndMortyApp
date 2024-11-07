@@ -17,19 +17,13 @@ interface CharacterDao {
     @Query("SELECT * FROM character WHERE :characterId = id")
     suspend fun getCharacterById(characterId: Int): Character?
 
-    // Get the last page number
-//    @Query("SELECT MAX(page) FROM Character")
-//    suspend fun getLastPage(): Int?
-
     // Search for characters by name
     @Query("SELECT * FROM character WHERE name LIKE '%' || :name || '%' COLLATE NOCASE")
     suspend fun getCharactersByName(name: String): List<Character>
 
-//    @Query("SELECT * FROM Character WHERE name LIKE '%rick%'")
-//    suspend fun getRickCharacters(): List<Character>
-
-//    @Query("SELECT * FROM Character ORDER BY id ASC")
-//    suspend fun getCharacters(): List<Character>
+    // Checking for missing characters
+    @Query("SELECT id FROM character")
+    suspend fun getAllCharacterIds(): List<Int>
 
     // Insert characters into the database
     @Insert(onConflict = OnConflictStrategy.REPLACE)

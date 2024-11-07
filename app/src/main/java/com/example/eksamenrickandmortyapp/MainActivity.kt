@@ -12,20 +12,25 @@ import com.example.eksamenrickandmortyapp.data.CharacterRepository
 import com.example.eksamenrickandmortyapp.navigation.CharacterDetails
 import com.example.eksamenrickandmortyapp.navigation.CharacterList
 import com.example.eksamenrickandmortyapp.navigation.CreateCharacter
+import com.example.eksamenrickandmortyapp.navigation.CustomCharacterList
 import com.example.eksamenrickandmortyapp.screens.character_details.CharacterDetailsScreen
 import com.example.eksamenrickandmortyapp.screens.character_details.CharacterDetailsViewModel
 import com.example.eksamenrickandmortyapp.ui.theme.EksamenRickAndMortyAppTheme
 import com.example.eksamenrickandmortyapp.screens.character_list.CharacterListScreen
 import com.example.eksamenrickandmortyapp.screens.character_list.CharacterListViewModel
-import com.example.eksamenrickandmortyapp.screens.custom_create.CustomCharacterCreateScreen
-import com.example.eksamenrickandmortyapp.screens.custom_create.CustomCharacterCreateViewModel
+import com.example.eksamenrickandmortyapp.screens.created_character_list.CustomCharacterListScreen
+import com.example.eksamenrickandmortyapp.screens.created_character_list.CustomCharacterListViewModel
+import com.example.eksamenrickandmortyapp.screens.create_character.CharacterCreateScreen
+import com.example.eksamenrickandmortyapp.screens.create_character.CharacterCreateViewModel
 
 class MainActivity : ComponentActivity() {
 
     // Late Initialization of ViewModel so the initialization
     private lateinit var _characterListViewModel: CharacterListViewModel
     private var _characterDetailsViewModel = CharacterDetailsViewModel()
-    private var _customCharacterCreateViewModel = CustomCharacterCreateViewModel()
+
+    private var _customCharacterCreateViewModel = CharacterCreateViewModel()
+//    private var _customCharacterListViewModel = CustomCharacterListViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 NavHost(navController = navController,
-                    startDestination = CharacterList
+                    startDestination = CharacterList /*TODO: Change back to characterList*/
                     ) {
 
                         composable<CharacterList> {
@@ -51,6 +56,9 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onCreateCharacterClick = {
                                     navController.navigate(CreateCharacter)
+                                },
+                                onCustomCharacterListClick = {
+                                    navController.navigate(CustomCharacterList)
                                 }
                             )
                         }
@@ -70,54 +78,26 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<CreateCharacter> {
-                        CustomCharacterCreateScreen(
+                        CharacterCreateScreen(
                             viewModel = _customCharacterCreateViewModel,
                             onSaveSuccess = { navController.popBackStack() },
-                            onBackButtonClick = { navController.popBackStack() }
+                            onBackButtonClick = { navController.navigate(CharacterList) }
 
                         )
                     }
-                }
 
-//                CharacterListScreen(
-//                    viewModel = _characterListViewModel,
-//                    onCharacterClick = { }
-//                )
+//                    composable<CustomCharacterList> {
+//                        CustomCharacterListScreen(
+//                            viewModel = _customCharacterListViewModel,
+//                            onBackButtonClick = { navController.popBackStack() }
+//                        )
+//                    }
+
+
+
+
+                }
             }
         }
     }
 }
-
-//@Composable
-//@Preview
-//fun CharacterItemScreen() {
-//    val character = Character(
-//        id = 1,
-//        name = "Rick Sanchez",
-//        status = "Alive",
-//        species = "Human",
-//        type = "",
-//        gender = "Male",
-//        origin = Origin(
-//            name = "Earth (C-137)",
-//            url = "https://rickandmortyapi.com/api/location/1"
-//        ),
-//        location = Location(
-//            name = "Citadel of Ricks",
-//            url = "https://rickandmortyapi.com/api/location/3"
-//        ),
-//        image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
-//        episode = listOf(
-//            "https://rickandmortyapi.com/api/episode/1",
-//            "https://rickandmortyapi.com/api/episode/2",
-//            "https://rickandmortyapi.com/api/episode/3",
-//        ),
-//        url = "https://rickandmortyapi.com/api/character/1",
-//        created = "2017-11-04T18:48:46.250Z"
-//    )
-//
-//    CharacterItem(
-//        character = character,
-//        onClick = { /* Handle click event here if needed */ }
-//    )
-//}

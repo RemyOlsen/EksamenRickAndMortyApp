@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -46,7 +47,8 @@ import androidx.compose.ui.unit.dp
 fun CharacterListScreen(
     viewModel: CharacterListViewModel,
     onCharacterClick: (characterId: Int) -> Unit = {},
-    onCreateCharacterClick: () -> Unit = {}
+    onCreateCharacterClick: () -> Unit = {},
+    onCustomCharacterListClick: () -> Unit = {}
 ) {
     val loading = viewModel.loading.collectAsState()
     val characters = viewModel.characters.collectAsState()
@@ -62,8 +64,7 @@ fun CharacterListScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Top bar
-
+        // Top navigation bar
         Row(modifier = Modifier.fillMaxWidth()
             .background(Color.White),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -79,6 +80,7 @@ fun CharacterListScreen(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Character creator
                 IconButton(
                     onClick = { onCreateCharacterClick() }
                 ) {
@@ -87,7 +89,19 @@ fun CharacterListScreen(
                         contentDescription = "Create Character"
                     )
                 }
+
+                // Custom Character List
+//                IconButton(
+//                    onClick = { onCustomCharacterListClick() }
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Face,
+//                        contentDescription = "Custom Character List"
+//                    )
+//                }
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 // List/Card view button
                 Box(modifier = Modifier
                     .size(30.dp)
@@ -107,18 +121,21 @@ fun CharacterListScreen(
                             tint = if (isListView) Color.White else Color.Black
                         )
                     }
-
                 }
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 IconButton(
-                    onClick = { viewModel.loadNextPage() }
+                    onClick = { /*viewModel.loadNextPage()*/ }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Refresh Characters"
                     )
                 }
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 IconButton(
                     onClick = { /* TODO */ }
                 ) {
@@ -153,6 +170,7 @@ fun CharacterListScreen(
             )
 
             Spacer(modifier = Modifier.width(8.dp))
+
             // Search button
             Button(
 //                modifier = Modifier.height(35.dp),
@@ -163,16 +181,28 @@ fun CharacterListScreen(
                 Text("Search")
             }
         }
-        Spacer(modifier = Modifier.height(2.dp))
 
-
+        Spacer(modifier = Modifier.height(8.dp))
 
         HorizontalDivider()
 
+        // Loading indicator if it's fetching data
+        if (loading.value) {
+            Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+        }
+
+        // Every Item in the list
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
                 .weight(1f)
         ) {
+
             items(characters.value) { character ->
                 if (isListView) {
                     CharacterItemSmall(
@@ -190,21 +220,21 @@ fun CharacterListScreen(
             }
 
             // Loads more characters when the user scrolls to the bottom of the list
-            item {
-                if (loading.value) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else if (!isSearching) {
-                    LaunchedEffect(Unit) {
-                        viewModel.loadNextPage()
-                    }
-                }
-            }
+//            item {
+//                if (loading.value) {
+//                    Box(modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(8.dp),
+//                    contentAlignment = Alignment.Center
+//                    ) {
+//                        CircularProgressIndicator()
+//                    }
+//                } else if (!isSearching) {
+//                    LaunchedEffect(Unit) {
+//                        viewModel.loadNextPage()
+//                    }
+//                }
+//            }
 
 
         }

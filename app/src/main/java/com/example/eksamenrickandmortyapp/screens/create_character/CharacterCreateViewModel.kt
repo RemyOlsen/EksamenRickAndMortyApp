@@ -1,13 +1,15 @@
-package com.example.eksamenrickandmortyapp.screens.custom_create
+package com.example.eksamenrickandmortyapp.screens.create_character
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.eksamenrickandmortyapp.data.CustomCharacter
+import com.example.eksamenrickandmortyapp.data.CustomCharacterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CustomCharacterCreateViewModel : ViewModel() {
+class CharacterCreateViewModel : ViewModel() {
 
     // StateFlows for inputs
     private val _characterName = MutableStateFlow("")
@@ -87,6 +89,8 @@ class CustomCharacterCreateViewModel : ViewModel() {
         viewModelScope.launch {
             _isSaving.value = true
 
+            Log.d("CustomCharacterCreateViewModel", "Saving custom character...")
+
             try {
                 val newCustomCharacter = CustomCharacter(
                     name = _characterName.value,
@@ -100,6 +104,10 @@ class CustomCharacterCreateViewModel : ViewModel() {
                     imageUrl = _imageUrl.value
 
                 )
+
+                CustomCharacterRepository.insertCustomCharacter(newCustomCharacter)
+
+                Log.d("CustomCharacterCreateViewModel", "New custom character saved: $newCustomCharacter")
                 _saveSuccess.value = true
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -32,27 +32,67 @@ class CharacterListViewModel : ViewModel() {
         _isListView.value = !_isListView.value
     }
 
-    // Load the first page of characters
+    //Load the first page of characters
+//    init {
+//        viewModelScope.launch {
+//            _loading.value = true
+//
+//            val cachedCharacters = CharacterRepository.getCachedCharacters()
+//            _characters.value = cachedCharacters
+//
+//            val lastFetchedPage = CharacterRepository.getLastFetchedPage() ?: 0
+//            currentPage = lastFetchedPage +1
+//
+//            _loading.value = false
+//        }
+//    }
+
     init {
         viewModelScope.launch {
-            _loading.value = true
-
-            val cachedCharacters = CharacterRepository.getCachedCharacters()
-            _characters.value = cachedCharacters
-
-            val lastFetchedPage = CharacterRepository.getLastFetchedPage() ?: 0
-            currentPage = lastFetchedPage +1
-
-            _loading.value = false
+            loadCharacters()
         }
     }
 
-//    fun loadCharacters() {
+
+    private suspend fun loadCharacters() {
+            _loading.value = true
+            if (CharacterRepository.getCachedCharacters().isEmpty()) {
+                fromApi()
+            } else {
+                fromDatabase()
+            }
+            _loading.value = false
+    }
+
+    private suspend fun fromApi() {
+        Log.d("CharacterListViewModel", "Loading all characters")
+        val allCharacters = CharacterRepository.getAllCharacters()
+        Log.d("CharacterListViewModel", "Loaded ${allCharacters.size} characters")
+        _characters.value = allCharacters
+    }
+
+    private suspend fun fromDatabase() {
+        Log.d("CharacterListViewModel", "Loading cached characters")
+        _characters.value = CharacterRepository.getCachedCharacters()
+    }
+
+
+
 //
-//        // Coroutine-scope to call Async functions
+//    fun loadAllPages() {
 //        viewModelScope.launch {
+//            Log.d("CharacterListViewModel", "Loading next page: $currentPage")
+//
+//            if(_loading.value) return@launch
+//
 //            _loading.value = true
-//            _characters.value = CharacterRepository.getCharacters()
+//            val newCharacters = CharacterRepository.getCharacters(currentPage)
+//
+//            if (newCharacters.isNotEmpty()) {
+//                _characters.value += newCharacters
+//                currentPage++
+//            }
+//
 //            _loading.value = false
 //        }
 //    }
@@ -77,22 +117,5 @@ class CharacterListViewModel : ViewModel() {
         }
     }
 
-    fun loadNextPage() {
-        viewModelScope.launch {
-            Log.d("CharacterListViewModel", "Loading next page: $currentPage")
-
-            if(_loading.value) return@launch
-
-            _loading.value = true
-            val newCharacters = CharacterRepository.getCharacters(currentPage)
-
-            if (newCharacters.isNotEmpty()) {
-                _characters.value += newCharacters
-                currentPage++
-            }
-
-            _loading.value = false
-        }
-    }
 
 }
