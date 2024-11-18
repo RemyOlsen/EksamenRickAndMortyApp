@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.eksamenrickandmortyapp.data.Character
+import com.example.eksamenrickandmortyapp.data.entities.Character
 
 @Dao
 interface CharacterDao {
@@ -16,6 +16,10 @@ interface CharacterDao {
     // Get character by Id
     @Query("SELECT * FROM character WHERE :characterId = id")
     suspend fun getCharacterById(characterId: Int): Character?
+
+    // Get highest ID added to the database
+    @Query("SELECT MAX(id) FROM character")
+    suspend fun getMaxCharacterId(): Int?
 
     // Search for characters by name
     @Query("SELECT * FROM character WHERE name LIKE '%' || :name || '%' COLLATE NOCASE")

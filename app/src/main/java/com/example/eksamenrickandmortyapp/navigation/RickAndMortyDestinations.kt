@@ -2,6 +2,10 @@ package com.example.eksamenrickandmortyapp.navigation
 
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+object FrontPage
+
 @Serializable
 object CharacterList
 
@@ -15,3 +19,4 @@ object CreateCharacter
 
 @Serializable
 object CustomCharacterList
+

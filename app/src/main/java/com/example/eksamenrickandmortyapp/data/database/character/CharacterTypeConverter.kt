@@ -1,8 +1,8 @@
 package com.example.eksamenrickandmortyapp.data.database.character
 
 import androidx.room.TypeConverter
-import com.example.eksamenrickandmortyapp.data.Location
-import com.example.eksamenrickandmortyapp.data.Origin
+import com.example.eksamenrickandmortyapp.data.entities.Location
+import com.example.eksamenrickandmortyapp.data.entities.Origin
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -36,17 +36,17 @@ object CharacterTypeConverter {
     }
 
 
-    // Converter for List<String> (episode urls)
+    // Converter for List<String> (episode urls and character urls)
     @TypeConverter
     @JvmStatic
-    fun fromStringList(episodes: List<String>): String {
-        return gson.toJson(episodes)
+    fun fromStringList(data: List<String>): String {
+        return gson.toJson(data)
     }
 
     @TypeConverter
     @JvmStatic
-    fun toStringList(episodeString: String): List<String> {
+    fun toStringList(data: String): List<String> {
         val listType = object : TypeToken<List<String>>() {}.type
-        return gson.fromJson(episodeString, listType)
+        return gson.fromJson(data, listType)
     }
 }

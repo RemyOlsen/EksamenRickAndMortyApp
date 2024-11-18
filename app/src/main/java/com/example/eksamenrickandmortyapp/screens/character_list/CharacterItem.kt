@@ -25,12 +25,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.eksamenrickandmortyapp.data.Character
-import com.example.eksamenrickandmortyapp.data.Location
-import com.example.eksamenrickandmortyapp.data.Origin
+import com.example.eksamenrickandmortyapp.data.entities.Character
+import com.example.eksamenrickandmortyapp.data.entities.Location
+import com.example.eksamenrickandmortyapp.data.entities.Origin
 
 @Composable
-fun CharacterItemSmall(
+fun CharacterItemList(
     character: Character,
     onClick: () -> Unit = {}
 ) {
@@ -47,9 +47,11 @@ fun CharacterItemSmall(
                 shape = RoundedCornerShape(10)
             )
             .background(
-                if (character.status == "Alive") Color(0xFF64ff47)
-                else if(character.status == "Dead") Color(0xFFff4947)
-                else Color(0xFFd7dcd6)
+                when (character.status) {
+                    "Alive" -> Color(0xFF64ff47)
+                    "Dead" -> Color(0xFFff4947)
+                    else -> Color(0xFFd7dcd6)
+                }
             )
             .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
@@ -57,7 +59,8 @@ fun CharacterItemSmall(
         AsyncImage(
             modifier = Modifier
                 .size(108.dp, 108.dp)
-                .background(color = Color.Gray),
+                .background(color = Color.Gray)
+            ,
             model = character.image,
             contentDescription = "Image of ${character.name}",
             alignment = Alignment.Center,
@@ -67,12 +70,15 @@ fun CharacterItemSmall(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(8.dp),
+                .padding(horizontal = 8.dp),
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
             ) {
+
+                //# Name
                 Text(
+
                     modifier = Modifier.width(220.dp),
                     text = character.name,
                     fontWeight = FontWeight.SemiBold,
@@ -82,6 +88,7 @@ fun CharacterItemSmall(
                     overflow = TextOverflow.Ellipsis
 
                 )
+                //# Character ID
                 Text(
                     modifier = Modifier
                         .align(Alignment.CenterEnd),
@@ -90,78 +97,134 @@ fun CharacterItemSmall(
                 )
             }
 
-            Spacer( modifier = Modifier.height(4.dp) )
+            Spacer( modifier = Modifier.height(2.dp) )
 
-            Text( text = "${character.species} - ${character.gender}" )
-
-            Spacer( modifier = Modifier.height(4.dp) )
-
+            //# Species and Gender
             Text(
-                text = "Status: ${character.status}",
-                fontSize = 14.sp
+                text = "${character.species} - ${character.gender}",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+
+            Spacer( modifier = Modifier.height(2.dp) )
+
+            //# Location Name
+            Text(
+                text = character.location.name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+//            Text(
+//                text = "Status: ${character.status}",
+//                fontSize = 14.sp
+//            )
+
 
         }
     } // Row
 }
 
 @Composable
-fun CharacterItemBig(
+fun CharacterItemCard(
     character: Character,
     onClick: () -> Unit = {}
 ) {
     
+    val characterStatusColor =
+        when (character.status) {
+            "Alive" -> Color(0xFF64ff47)
+            "Dead" -> Color(0xFFff4947)
+            else -> Color(0xFFd7dcd6)
+        }
+
+    val textColor =
+        when (character.status) {
+            "Dead" -> Color.White
+            else -> Color.Black
+        }
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(196.dp)
             .padding(12.dp)
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(5))
-            .background(
-                if (character.status == "Alive") Color(0xFF64ff47)
-                else if(character.status == "Dead") Color(0xFFff4947)
-                else Color(0xFFd7dcd6))
+            .background(color = characterStatusColor)
             .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(342.dp)
-                .background(color = Color.Gray),
-            model = character.image,
-            contentDescription = "Image of ${character.name}",
-            alignment = Alignment.Center,
-            contentScale = ContentScale.Crop,
-        )
+        Box() {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .size(156.dp)
+                    .background(color = Color.Gray)
+                    ,
+                model = character.image,
+                contentDescription = "Image of ${character.name}",
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Crop,
+            )
+
+            //# Character ID
+            Text(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .background(
+                        color = characterStatusColor,
+                        shape = RoundedCornerShape(topStart = 10.dp),
+                    )
+                ,
+                text = "#${character.id}",
+                fontSize = 12.sp,
+                color = textColor
+            )
+
+        }
 
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(3.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
             ) {
+
+                // #Name
                 Text(
                     modifier = Modifier.align(Alignment.Center),
                     text = character.name,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF031400),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = textColor,
+                    fontSize = 16.sp
                 )
-                Text(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    text = "#${character.id}"
-                )
+
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(1.dp))
 
-            Text(text = character.species)
+            //# Species
+            Text(
+                text = "${character.species} - ${character.gender}",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = textColor,
+                fontSize = 14.sp
+            )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(text = character.status)
+//            Spacer(modifier = Modifier.height(1.dp))
+            
+            //# Location Name
+            Text(
+                text = character.location.name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = textColor,
+                fontSize = 14.sp
+            )
         }
     }
 }
@@ -169,10 +232,10 @@ fun CharacterItemBig(
 @Preview(showBackground = true)
 @Composable
 fun CharacterItemPreview() {
-    CharacterItemSmall(
+    CharacterItemList(
         character = Character(
             id = 1,
-            name = "Rick Sanchez really fucking long name to make issues with overflow",
+            name = "Rick Sanchez reeeeeeeeaaaaaaaaaaally long name to make issues with overflow yas qweeeeeeen",
             status = "Alive",
             species = "Human",
             type = "",
@@ -200,7 +263,7 @@ fun CharacterItemPreview() {
 @Preview(showBackground = true)
 @Composable
 fun CharacterItemVerticalPreview() {
-    CharacterItemBig(
+    CharacterItemCard(
             character = Character(
              id = 1,
             name = "Rick Sanchez",

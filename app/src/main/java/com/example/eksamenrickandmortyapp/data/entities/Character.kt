@@ -1,4 +1,4 @@
-package com.example.eksamenrickandmortyapp.data
+package com.example.eksamenrickandmortyapp.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -35,11 +35,11 @@ data class Location(
 )
 
 data class CharacterListResponse(
-    val info: Info,
+    val info: Meta,
     val results: List<Character>
 )
 
-data class Info (
+data class Meta (
     val count: Int,
     val pages: Int,
     val next: String?,

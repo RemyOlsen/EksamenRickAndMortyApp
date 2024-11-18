@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.room.Room
 import com.example.eksamenrickandmortyapp.data.database.AppDatabase
+import com.example.eksamenrickandmortyapp.data.entities.Character
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okio.IOException
@@ -31,7 +32,7 @@ object CharacterRepository {
 
     private lateinit var _appDatabase: AppDatabase
     private val _characterDao by lazy { _appDatabase.characterDao() }
-    private val _pageInfoDao by lazy { _appDatabase.pageInfoDao() }
+//    private val _metaInfoDao by lazy { _appDatabase.metaInfoDao() }
 
     fun initializeDatabase(context: Context) {
         _appDatabase = Room.databaseBuilder(
@@ -63,9 +64,6 @@ object CharacterRepository {
                 // Storing the characters in the database
                 _characterDao.insertCharacters(characters)
 
-                // Storing the last fetched page in the database
-                _pageInfoDao.insertPageInfo(PageInfo(lastFetchedPage = page))
-
                 Log.d("CharacterRepository", "Successfully updated characters from page: $page from the API")
 
                 // Returning only the new characters
@@ -82,69 +80,45 @@ object CharacterRepository {
         }
     }
 
-    suspend fun getAllCharacters(): List<Character> {
-        val allCharacters = mutableListOf<Character>()
-
+    // getting the total page count from the meta data
+    suspend fun getTotalPageCount(): Int? {
         try {
-            val firstPageResponse = _characterService.getAllCharacters(1)
-
-            if (!firstPageResponse.isSuccessful) {
-                Log.e("CharacterRepository", "Failed to get response from the first page")
-                return emptyList()
+            val response = _characterService.getAllCharacters(1)
+            return if (response.isSuccessful) {
+                response.body()?.info?.pages
+            } else {
+                null
             }
-
-            val firstPageBody = firstPageResponse.body()
-            if (firstPageBody == null) {
-                Log.e("CharacterRepository", "First page body is null")
-                return emptyList()
-            }
-
-            allCharacters.addAll(firstPageBody.results)
-
-            val totalPages = firstPageBody.info.pages
-            for (page in 2..totalPages) {
-                val pageResponse = _characterService.getAllCharacters(page)
-
-                if (!pageResponse.isSuccessful) {
-                    Log.e("CharacterRepository", "Failed to get response from page: $page")
-                    continue
-                }
-
-                val pageBody = pageResponse.body()
-                if (pageBody == null) {
-                    Log.e("CharacterRepository", "Page $page body is null")
-                    continue
-                }
-
-                allCharacters.addAll(pageBody.results)
-            }
-
-            _characterDao.insertCharacters(allCharacters)
-
-            return allCharacters
-        } catch (e: IOException) {
-            Log.e("CharacterRepository", "Network error, unable to connect to the API, getting characters from database", e)
-            return emptyList()
-            } catch (e: Exception) {
-            Log.e("CharacterRepository", "Failed to get list of characters, getting characters from database", e)
-            return emptyList()
+        } catch(e: Exception) {
+            Log.e("CharacterRepository", "Failed to get total page count", e)
+            return null
         }
     }
 
+    // Getting total characters from the meta data
+    suspend fun getTotalCharacterCount(): Int? {
+        try {
+            val response =_characterService.getAllCharacters(1)
+            return if (response.isSuccessful) {
+                response.body()?.info?.count
+            } else {
+                null
+            }
+
+        } catch(e: Exception) {
+            Log.e("CharacterRepository", "Failed to get character count", e)
+            return null
+        }
+    }
 
     suspend fun getCharacterById(characterId: Int): Character? {
         return _characterDao.getCharacterById(characterId)
     }
+
 
     suspend fun getCachedCharacters(): List<Character> {
         Log.d("CharacterRepository - fun getCachedCharacters", "Getting characters from database")
         return _characterDao.getCharacters()
     }
 
-    suspend fun getCharactersByName(name: String): List<Character> {
-        return _characterDao.getCharactersByName(name)
-    }
-    suspend fun getLastFetchedPage(): Int? {
-        return _pageInfoDao.getLastFetchedPage()
-    }
 }

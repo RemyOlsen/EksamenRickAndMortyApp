@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.eksamenrickandmortyapp.data.CustomCharacter
+import com.example.eksamenrickandmortyapp.data.entities.CustomCharacter
 
 @Dao
 interface CustomCharacterDao {

@@ -1,5 +1,7 @@
 package com.example.eksamenrickandmortyapp.data
 
+import com.example.eksamenrickandmortyapp.data.entities.CustomCharacter
+
 object CustomCharacterRepository {
     private val _customCharacterDao by lazy { CharacterRepository.getAppDatabase().customCharacterDao() }
 
