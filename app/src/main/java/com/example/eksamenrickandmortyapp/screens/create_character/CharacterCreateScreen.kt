@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -70,7 +71,8 @@ fun CharacterCreateScreen(
     viewModel: CharacterCreateViewModel,
     onSaveSuccess: () -> Unit = {},
     onBackButtonClick: () -> Unit = {},
-    onImageButtonClick: () -> Unit = {}
+    onImageButtonClick: () -> Unit = {},
+    onLogoClick: () -> Unit = {}
 ) {
     val rickAndMortyFont = FontFamily(
         Font(R.font.wubba_lubba_dub_dub)
@@ -131,7 +133,9 @@ fun CharacterCreateScreen(
             }
 
             Text(
-                modifier = Modifier.padding(start = 30.dp),
+                modifier = Modifier
+                    .clickable { onLogoClick() }
+                    .padding(start = 30.dp),
                 text = "Create a Character",
                 fontFamily = rickAndMortyFont,
                 fontSize = 32.sp,
@@ -421,11 +425,12 @@ fun CharacterCreateScreen(
 
                     } else {
                         Text(
-                            modifier = Modifier.padding(start = 16.dp)
+                            modifier = Modifier
                                 .fillMaxWidth(),
                             text = "No images available\n" +
                                     "Click to Load",
                             color = Color.White,
+                            textAlign = TextAlign.Center,
                             fontSize = 16.sp,
                         )
                     }

@@ -20,3 +20,11 @@ object CreateCharacter
 @Serializable
 object CustomCharacterList
 
+@Serializable
+object EpisodeList
+
+@Serializable
+data class EpisodeDetails(
+    val episodeId: Int
+)
+

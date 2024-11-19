@@ -2,6 +2,7 @@ package com.example.eksamenrickandmortyapp.screens.character_list
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,8 +32,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -44,15 +49,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.eksamenrickandmortyapp.R
 import com.example.eksamenrickandmortyapp.components.SearchBar
+import kotlinx.coroutines.delay
 
 
 @Composable
 fun CharacterListScreen(
     viewModel: CharacterListViewModel,
     onCharacterClick: (characterId: Int) -> Unit = {},
-    onCreateCharacterClick: () -> Unit = {},
-    onCustomCharacterListClick: () -> Unit = {},
-    onBackButtonClick: () -> Unit = {}
+    onBackButtonClick: () -> Unit = {},
+    onLogoClick: () -> Unit = {}
 ) {
 
     val rickAndMortyFont = FontFamily(
@@ -70,7 +75,7 @@ fun CharacterListScreen(
     val loadAmountOfCharacters by viewModel.amountOfCharacters.collectAsState()
 
     // Characters collected
-    val characters = viewModel.characters.collectAsState()
+    val characters by viewModel.characters.collectAsState()
 
     // Toggle between views
     val isListView by viewModel.isListView.collectAsState()
@@ -79,16 +84,27 @@ fun CharacterListScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isSearching = searchQuery.isNotEmpty()
 
-    // Boolean to check if status messages are visible
-    val statusMessagesVisible = !isSearching && (
+    // API Notification message
+    var showConnectionMessage by remember { mutableStateOf(true) }
+
+    val pullingFromDatabase = !loading.value && loadTotalPages == null && characters.isNotEmpty()
+    val statusMessagesVisible =
+        showConnectionMessage && !isSearching && (
             loading.value ||
             (loadTotalPages == null && !loading.value) ||
             (loadTotalPages != null && loading.value) ||
             (loading.value && loadingCurrentPage < 1)
             )
 
-
-    Log.d("CharacterListScreen", "TotalPages: $loadTotalPages")
+    // Timer for the notification if there's something in the database but it can't reach the database
+    // To make the searchbar visible again
+    LaunchedEffect(pullingFromDatabase) {
+        if (pullingFromDatabase && loadTotalPages == null) {
+            showConnectionMessage = true
+            delay(3000)
+            showConnectionMessage = false
+        }
+    }
 
 //    LaunchedEffect(Unit) {
 //        viewModel.loadAllFunctions()
@@ -100,8 +116,12 @@ fun CharacterListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFFbf7da5), Color(0xFFecaba6), Color(0xFFf8e99a))
-            )),
+                colors = listOf(
+                    Color(0xFFbf7da5),
+                    Color(0xFFecaba6),
+                    Color(0xFFf8e99a)
+                ))
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -123,7 +143,9 @@ fun CharacterListScreen(
             }
 
             Text(
-                modifier = Modifier.padding(start = 80.dp),
+                modifier = Modifier
+                    .clickable { onLogoClick() }
+                    .padding(start = 80.dp),
                 text = "Characters",
                 fontFamily = rickAndMortyFont,
                 fontSize = 32.sp,
@@ -176,7 +198,7 @@ fun CharacterListScreen(
                 ) {
                     Icon(
                         tint = when (loading.value) { // So the color changes when it's not usable
-                            true -> Color.Gray
+                            true -> Color.Transparent
                             false -> Color.White
                         },
                         imageVector = Icons.Default.Refresh,
@@ -201,6 +223,7 @@ fun CharacterListScreen(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth(),
+                defaultText = "Search Characters",
                 color = Color.White,
                 query = searchQuery,
                 onQueryChange = { newValue ->
@@ -213,66 +236,6 @@ fun CharacterListScreen(
 //                    viewModel.searchCharacters(searchQuery)
                 }
             )
-
-//            val focusManager = LocalFocusManager.current
-//            OutlinedTextField(
-//                modifier = Modifier.padding(8.dp),
-//                value = searchQuery,
-//                onValueChange = { newValue ->
-//
-//                    viewModel.searchCharacters(newValue)
-//                },
-//                label = {
-//                    Icon(
-//                        imageVector = Icons.Default.Search,
-//                        tint = Color.White,
-//                        contentDescription = "Search")
-//                    Text(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 32.dp),
-//                        text = "Search Characters",
-//                        fontSize = 16.sp,
-//                        color = Color.White
-//                    )
-//                        },
-//                trailingIcon = {
-//                    if (searchQuery.isNotEmpty()) {
-//                        IconButton(onClick = {
-//                            viewModel.searchCharacters("")
-//                            focusManager.clearFocus()
-//                        }) {
-//                            Icon(
-//                                tint = Color.White,
-//                                imageVector = Icons.Default.Close,
-//                                contentDescription = "Clear"
-//                            )
-//                        }
-//                    }
-//                },
-//                colors = TextFieldDefaults.colors(
-//                    focusedTextColor = Color.White, // Input text color when focused
-//                    unfocusedTextColor = Color.White, // Input text color when unfocused
-//                    cursorColor = Color.White, // Cursor color
-//                    focusedContainerColor = Color.Transparent, // Background color when focused
-//                    unfocusedContainerColor = Color.Transparent, // Background color when unfocused
-//                    focusedIndicatorColor = Color.White, // Border color when focused
-//                    unfocusedIndicatorColor = Color.Gray // Border color when unfocused
-//                ),
-//
-//                singleLine = true,
-//                shape = RoundedCornerShape(25.dp),
-//                keyboardOptions = KeyboardOptions.Default.copy(
-//                    imeAction = ImeAction.Search
-//                ),
-//                keyboardActions = KeyboardActions(
-//                    onSearch = {
-//
-//    //                    viewModel.searchCharacters(searchQuery)
-//                        focusManager.clearFocus()
-//                    }
-//                )
-//            )
         }
 
 
@@ -301,8 +264,10 @@ fun CharacterListScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Can't reach API\nCheck your internet connection.",
-                                style = MaterialTheme.typography.bodyMedium,
+                                text = "Can't reach API" +
+                                        "\nCheck your internet connection" +
+                                        "\nand refresh the page",
+                                fontSize = 16.sp, // Equivalent to bodyMedium
                                 textAlign = TextAlign.Center,
                                 color = Color.Black
                             )
@@ -314,7 +279,7 @@ fun CharacterListScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Connecting to the API...",
-                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 16.sp, // Equivalent to bodyMedium
                                 textAlign = TextAlign.Center,
                                 color = Color.Black
                             )
@@ -326,8 +291,8 @@ fun CharacterListScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Loading page $loadingCurrentPage of $loadTotalPages" +
-                                        "\n$loadAmountOfCharacters of $loadTotalCharacters Characters Loaded",
-                                style = MaterialTheme.typography.bodyMedium,
+                                        "\n$loadAmountOfCharacters of $loadTotalCharacters Episodes Loaded",
+                                fontSize = 16.sp, // Equivalent to bodyMedium
                                 textAlign = TextAlign.Center,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -343,7 +308,7 @@ fun CharacterListScreen(
                                     text = "Bad Connection!" +
                                             "\nFailed to load page $loadingCurrentPage, trying again." +
                                             "\nAttempt ${loadingAttempts.value}",
-                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 14.sp, // Equivalent to bodySmall
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -364,7 +329,7 @@ fun CharacterListScreen(
         }
 
         // Message to tell the user that there's no characters stored on device if they have no connection
-        if (characters.value.isEmpty() && loadTotalPages == null && !loading.value) {
+        if (characters.isEmpty() && loadTotalPages == null && !loading.value) {
             Column(modifier = Modifier.padding(top = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
@@ -387,29 +352,6 @@ fun CharacterListScreen(
 
             }
 
-//        // Every Item from the API
-//        LazyColumn(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .weight(1f)
-//        ) {
-//
-//            items(characters.value) { character ->
-//                if (isListView) {
-//                    CharacterItemList(
-//                        character = character,
-//                        onClick = { onCharacterClick(character.id) }
-//                    )
-//                } else {
-//                    CharacterItemCard(
-//                        character = character,
-//                        onClick = { onCharacterClick(character.id) }
-//                    )
-//
-//                }
-//
-//            }
-
 
         LazyColumn(
             modifier = Modifier
@@ -418,9 +360,7 @@ fun CharacterListScreen(
         ) {
 
             // .chunked puts the characters in a list of lists of 2
-            val characterPairs = characters.value.chunked(2)
-
-
+            val characterPairs = characters.chunked(2)
             if (!isListView) {
                 items(characterPairs) { characterPair ->
                     Row(
@@ -434,13 +374,10 @@ fun CharacterListScreen(
 
                             )
                         }
-                        if (characterPair.size < 2) {
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
                     }
                 }
             } else {
-                items(characters.value) { character ->
+                items(characters) { character ->
                     CharacterItemList(
                         character = character,
                         onClick = { onCharacterClick(character.id) }

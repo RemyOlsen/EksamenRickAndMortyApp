@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun SearchBar(
+    defaultText: String,
     query: String,
     onQueryChange: (String) -> Unit,
     onClearClick: () -> Unit,
@@ -57,7 +58,7 @@ fun SearchBar(
                 Spacer(modifier = Modifier.width(4.dp))
 
                 Text(
-                    text = "Search Characters",
+                    text = defaultText,
                     fontSize = 16.sp,
                     color = color
                 )

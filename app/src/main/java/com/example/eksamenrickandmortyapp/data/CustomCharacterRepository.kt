@@ -13,6 +13,4 @@ object CustomCharacterRepository {
         return _customCharacterDao.getAllCustomCharacters()
     }
 
-
-
 }

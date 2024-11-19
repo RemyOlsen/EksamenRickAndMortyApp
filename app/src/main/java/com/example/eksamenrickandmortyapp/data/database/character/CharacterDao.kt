@@ -17,17 +17,14 @@ interface CharacterDao {
     @Query("SELECT * FROM character WHERE :characterId = id")
     suspend fun getCharacterById(characterId: Int): Character?
 
-    // Get highest ID added to the database
-    @Query("SELECT MAX(id) FROM character")
-    suspend fun getMaxCharacterId(): Int?
+    // Get multiple characters by the IDs
+    @Query("SELECT * FROM character WHERE id IN (:ids)")
+    suspend fun getCharactersByIds(ids: List<Int>): List<Character>
 
     // Search for characters by name
+    // (Old Search function, I search directly from the viewModel now when it gets characters for optimization)
     @Query("SELECT * FROM character WHERE name LIKE '%' || :name || '%' COLLATE NOCASE")
     suspend fun getCharactersByName(name: String): List<Character>
-
-    // Checking for missing characters
-    @Query("SELECT id FROM character")
-    suspend fun getAllCharacterIds(): List<Int>
 
     // Insert characters into the database
     @Insert(onConflict = OnConflictStrategy.REPLACE)

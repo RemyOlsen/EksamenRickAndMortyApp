@@ -1,6 +1,7 @@
 package com.example.eksamenrickandmortyapp.screens.created_character_list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,7 +44,8 @@ import com.example.eksamenrickandmortyapp.components.SearchBar
 fun CustomCharacterListScreen(
     viewModel: CustomCharacterListViewModel,
     onAddNewCharacterClick: () -> Unit = {},
-    onBackButtonClick: () -> Unit = {}
+    onBackButtonClick: () -> Unit = {},
+    onLogoClick: () -> Unit = {}
 ) {
 
     val rickAndMortyFont = FontFamily(
@@ -74,7 +76,6 @@ fun CustomCharacterListScreen(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
-//                .background(Color.White)
             ,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -87,7 +88,9 @@ fun CustomCharacterListScreen(
             }
 
             Text(
-                modifier = Modifier.padding(start = 30.dp),
+                modifier = Modifier
+                    .clickable { onLogoClick() }
+                    .padding(start = 30.dp),
                 text = "Custom Characters",
                 fontFamily = rickAndMortyFont,
                 fontSize = 32.sp,
@@ -110,6 +113,7 @@ fun CustomCharacterListScreen(
                     .padding(end = 16.dp)
                     .width(300.dp)
                 ,
+                defaultText = "Search Characters",
                 query = searchQuery,
                 color = Color.Gray,
                 onQueryChange = { newValue ->

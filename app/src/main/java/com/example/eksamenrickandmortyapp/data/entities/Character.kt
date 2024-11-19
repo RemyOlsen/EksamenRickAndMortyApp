@@ -35,11 +35,11 @@ data class Location(
 )
 
 data class CharacterListResponse(
-    val info: Meta,
+    val info: CharacterMeta,
     val results: List<Character>
 )
 
-data class Meta (
+data class CharacterMeta (
     val count: Int,
     val pages: Int,
     val next: String?,

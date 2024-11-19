@@ -5,34 +5,14 @@ import android.util.Log
 import androidx.room.Room
 import com.example.eksamenrickandmortyapp.data.database.AppDatabase
 import com.example.eksamenrickandmortyapp.data.entities.Character
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import okio.IOException
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 object CharacterRepository {
 
-    // Logging interceptor for better logging
-    private val _httpClient = OkHttpClient.Builder()
-        .addInterceptor(HttpLoggingInterceptor()
-            .setLevel(HttpLoggingInterceptor.Level.BODY)
-        )
-        .build()
-
-    // Retrofit to connect to the API
-    private val _retrofit =
-        Retrofit.Builder()
-            .client(_httpClient)
-            .baseUrl("https://rickandmortyapi.com/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-    private val _characterService = _retrofit.create(CharacterService::class.java)
+   private val _apiService = ApiClient.apiService
 
     private lateinit var _appDatabase: AppDatabase
     private val _characterDao by lazy { _appDatabase.characterDao() }
-//    private val _metaInfoDao by lazy { _appDatabase.metaInfoDao() }
 
     fun initializeDatabase(context: Context) {
         _appDatabase = Room.databaseBuilder(
@@ -42,6 +22,7 @@ object CharacterRepository {
         ).build()
     }
 
+    // Getter for the appDatabase so I can split the repositories
     fun getAppDatabase(): AppDatabase {
         if (!::_appDatabase.isInitialized) {
             throw IllegalStateException("you need to 'initializeDatabase() before getting it.")
@@ -49,11 +30,11 @@ object CharacterRepository {
         return _appDatabase
     }
 
-    suspend fun getCharacters(page: Int): List<Character> {
+    suspend fun getCharactersFromApi(page: Int): List<Character> {
 
         try {
 
-            val response = _characterService.getAllCharacters(page)
+            val response = _apiService.getAllCharacters(page)
 
             if (response.isSuccessful) {
 
@@ -81,9 +62,9 @@ object CharacterRepository {
     }
 
     // getting the total page count from the meta data
-    suspend fun getTotalPageCount(): Int? {
+    suspend fun getTotalPagesCount(): Int? {
         try {
-            val response = _characterService.getAllCharacters(1)
+            val response = _apiService.getAllCharacters(1)
             return if (response.isSuccessful) {
                 response.body()?.info?.pages
             } else {
@@ -98,7 +79,7 @@ object CharacterRepository {
     // Getting total characters from the meta data
     suspend fun getTotalCharacterCount(): Int? {
         try {
-            val response =_characterService.getAllCharacters(1)
+            val response =_apiService.getAllCharacters(1)
             return if (response.isSuccessful) {
                 response.body()?.info?.count
             } else {
@@ -112,13 +93,31 @@ object CharacterRepository {
     }
 
     suspend fun getCharacterById(characterId: Int): Character? {
-        return _characterDao.getCharacterById(characterId)
+        return try {
+            _characterDao.getCharacterById(characterId)
+        } catch (e: Exception) {
+            Log.e("CharacterRepository", "Error fetching character by ID", e)
+            null
+        }
     }
 
-
     suspend fun getCachedCharacters(): List<Character> {
-        Log.d("CharacterRepository - fun getCachedCharacters", "Getting characters from database")
-        return _characterDao.getCharacters()
+        Log.d("CharacterRepository", "Getting characters from database")
+        return try {
+            _characterDao.getCharacters()
+        } catch (e: Exception) {
+            Log.e("CharacterRepository", "Error fetching cached characters", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getCharactersByIds(ids: List<Int>): List<Character> {
+        return try {
+            _characterDao.getCharactersByIds(ids)
+        } catch (e: Exception) {
+            Log.e("CharacterRepository", "Error fetching characters by IDs", e)
+            emptyList()
+        }
     }
 
 }

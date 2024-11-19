@@ -53,20 +53,22 @@ class CharacterListViewModel : ViewModel() {
     }
 
     fun loadAllFunctions() {
-        getTotalPagesAndCharacters()
-        getTotalCharacters()
+        getTotalCharacterPagesCount()
+        getTotalCharactersCount()
         loadAllPages()
     }
 
-    private fun getTotalPagesAndCharacters() {
+    // To add the character page count to mutableStateFlow
+    private fun getTotalCharacterPagesCount() {
         viewModelScope.launch(Dispatchers.IO) {
-            val totalPages = CharacterRepository.getTotalPageCount()
+            val totalPages = CharacterRepository.getTotalPagesCount()
             Log.d("CharacterListViewModel", "Total pages found in API: $totalPages")
             _totalPages.value = totalPages
         }
     }
 
-    private fun getTotalCharacters() {
+    // To add the character count to mutableStateFlow
+    private fun getTotalCharactersCount() {
         viewModelScope.launch(Dispatchers.IO) {
             val totalCharacters = CharacterRepository.getTotalCharacterCount()
             Log.d("CharacterListViewModel", "Total characters found in API: $totalCharacters")
@@ -87,7 +89,7 @@ class CharacterListViewModel : ViewModel() {
             // This will check if the total number of characters in the api is greater than the cached characters
             // Should theoretically reload all pages if the api changes
             if ( totalApiCharacters != null && totalApiCharacters > cachedCharacters ) {
-                val totalPages = CharacterRepository.getTotalPageCount()
+                val totalPages = CharacterRepository.getTotalPagesCount()
 
                 Log.d("CharacterListViewModel", "Total pages: $totalPages")
 
@@ -125,7 +127,7 @@ class CharacterListViewModel : ViewModel() {
 
         while (!success) {
             try {
-                val newCharacters = CharacterRepository.getCharacters(page)
+                val newCharacters = CharacterRepository.getCharactersFromApi(page)
                 _loadingAttempts.value = attempts + 1
                 Log.d("CharacterListViewModel", "Loaded ${newCharacters.size} characters from page $page")
                 Log.d("CharacterListViewModel", "Attempts: $attempts")
@@ -147,7 +149,6 @@ class CharacterListViewModel : ViewModel() {
                 }
             }
         }
-
     }
 
     fun clearSearchQuery() {
@@ -179,70 +180,6 @@ class CharacterListViewModel : ViewModel() {
             _loading.value = false
         }
     }
-
-//    fun searchCharactersByName(name: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            _loading.value = true
-//
-//            if (name.isBlank()) { // Not in Search mode
-//                _characters.value = CharacterRepository.getCachedCharacters()
-//
-//            } else { // In Search mode
-//                Log.d("CharacterListViewModel", "Searching for: $name")
-//                val searchResults = CharacterRepository.getCharactersByName(name)
-//                _characters.value = searchResults
-//            }
-//
-//            _loading.value = false
-//        }
-//    }
-
-
-
-    //Load the first page of characters
-//    init {
-//        viewModelScope.launch {
-//            _loading.value = true
-//
-//            val cachedCharacters = CharacterRepository.getCachedCharacters()
-//            _characters.value = cachedCharacters
-//
-//            val lastFetchedPage = CharacterRepository.getLastFetchedPage() ?: 0
-//            currentPage = lastFetchedPage +1
-//
-//            _loading.value = false
-//        }
-//    }
-
-//    init {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            loadCharacters()
-//        }
-//    }
-//
-//
-//    private suspend fun loadCharacters() {
-//            _loading.value = true
-//            if (CharacterRepository.getCachedCharacters().isEmpty()) {
-//                fromApi()
-//            } else {
-//                fromDatabase()
-//            }
-//            _loading.value = false
-//    }
-//
-//    private suspend fun fromApi() {
-//        Log.d("CharacterListViewModel", "Loading all characters")
-//        val allCharacters = CharacterRepository.getAllCharacters()
-//        Log.d("CharacterListViewModel", "Loaded ${allCharacters.size} characters")
-//        _characters.value = allCharacters
-//    }
-//
-//    private suspend fun fromDatabase() {
-//        Log.d("CharacterListViewModel", "Loading cached characters")
-//        _characters.value = CharacterRepository.getCachedCharacters()
-//    }
-
 
 
 }
